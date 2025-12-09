@@ -1,0 +1,9 @@
+/* LUMINA_SORT - Main CSS Import File */
+
+@import url('base.css');
+@import url('components.css');
+@import url('layout.css');
+@import url('pages/hero.css');
+@import url('pages/gallery.css');
+@import url('pages/recipes.css');
+@import url('pages/processing.css');

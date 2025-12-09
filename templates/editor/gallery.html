@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}My Gallery — LUMINA_SORT{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>My Gallery</h1>
+        <p class="page-subtitle">{{ art_pieces.count }} piece{{ art_pieces.count|pluralize }}</p>
+    </div>
+    
+    {% if art_pieces %}
+    <div class="gallery-grid">
+        {% for art in art_pieces %}
+        <div class="gallery-card">
+            <div class="gallery-image">
+                {% if art.processed_image %}
+                <a href="{% url 'result' art.id %}">
+                    <img src="{{ art.processed_image.url }}" alt="{{ art.title }}">
+                </a>
+                {% elif art.original_image %}
+                <a href="{% url 'process' art.id %}">
+                    <img src="{{ art.original_image.url }}" alt="{{ art.title }}" class="unprocessed">
+                </a>
+                {% endif %}
+            </div>
+            <div class="gallery-info">
+                <h3>{{ art.title }}</h3>
+                <p class="gallery-date">{{ art.created_at|date:"M d, Y" }}</p>
+                <div class="gallery-actions">
+                    {% if art.processed_image %}
+                    <a href="{% url 'result' art.id %}" class="btn-small">View</a>
+                    <a href="{% url 'process' art.id %}" class="btn-small">Re-process</a>
+                    {% else %}
+                    <a href="{% url 'process' art.id %}" class="btn-small btn-primary">Process</a>
+                    {% endif %}
+                    <form method="post" action="{% url 'toggle_public' art.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-small">
+                            {% if art.is_public %}Public{% else %}Private{% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'delete_art' art.id %}" style="display:inline;" 
+                          onsubmit="return confirm('Delete this piece?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-small btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No art pieces yet.</p>
+        <a href="{% url 'upload' %}" class="btn-solid">Create Your First</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

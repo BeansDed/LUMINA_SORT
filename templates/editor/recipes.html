@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Recipes — LUMINA_SORT{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>Aesthetic Recipes</h1>
+        <p class="page-subtitle">Pre-configured sorting parameters</p>
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_recipe' %}" class="btn-outline">Create Recipe</a>
+        {% endif %}
+    </div>
+    
+    {% if recipes %}
+    <div class="recipes-list">
+        {% for recipe in recipes %}
+        <div class="recipe-card-full">
+            <div class="recipe-header">
+                <h2>{{ recipe.name }}</h2>
+                <span class="recipe-uses">{{ recipe.times_used }} uses</span>
+            </div>
+            {% if recipe.description %}
+            <p class="recipe-description">{{ recipe.description }}</p>
+            {% endif %}
+            <div class="recipe-parameters">
+                <div class="param">
+                    <span class="param-label">Direction</span>
+                    <span class="param-value">{{ recipe.get_sort_direction_display }}</span>
+                </div>
+                <div class="param">
+                    <span class="param-label">Sort By</span>
+                    <span class="param-value">{{ recipe.get_sort_by_display }}</span>
+                </div>
+                <div class="param">
+                    <span class="param-label">Threshold</span>
+                    <span class="param-value">{{ recipe.threshold_low|floatformat:2 }} — {{ recipe.threshold_high|floatformat:2 }}</span>
+                </div>
+                <div class="param">
+                    <span class="param-label">Reverse</span>
+                    <span class="param-value">{% if recipe.reverse_sort %}Yes{% else %}No{% endif %}</span>
+                </div>
+            </div>
+            <div class="recipe-meta">
+                {% if recipe.creator %}
+                <span>Created by {{ recipe.creator.username }}</span>
+                {% endif %}
+                <span>{{ recipe.created_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No recipes available yet.</p>
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_recipe' %}" class="btn-solid">Create the First Recipe</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

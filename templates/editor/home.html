@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}LUMINA_SORT — Algorithmic Editorial Engine{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            ALGORITHMIC<br>
+            <span class="accent">EDITORIAL</span><br>
+            ENGINE
+        </h1>
+        <p class="hero-subtitle">
+            Transform photography into high-fashion glitch art using deterministic 
+            pixel sorting algorithms. No neural networks. Pure mathematics.
+        </p>
+        <div class="hero-actions">
+            {% if user.is_authenticated %}
+                <a href="{% url 'upload' %}" class="btn-solid btn-large">Start Creating</a>
+            {% else %}
+                <a href="{% url 'signup' %}" class="btn-solid btn-large">Get Started</a>
+                <a href="{% url 'login' %}" class="btn-outline btn-large">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2 class="section-title">How It Works</h2>
+    <div class="features-grid">
+        <div class="feature">
+            <span class="feature-number">01</span>
+            <h3>Upload</h3>
+            <p>Select any photograph from your device.</p>
+        </div>
+        <div class="feature">
+            <span class="feature-number">02</span>
+            <h3>Configure</h3>
+            <p>Set thresholds, direction, and sorting criteria.</p>
+        </div>
+        <div class="feature">
+            <span class="feature-number">03</span>
+            <h3>Process</h3>
+            <p>The algorithm physically rearranges pixel data.</p>
+        </div>
+        <div class="feature">
+            <span class="feature-number">04</span>
+            <h3>Export</h3>
+            <p>Download optimized for Instagram Story or Post.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section section-dark">
+    <h2 class="section-title">The Mathematics</h2>
+    <div class="math-explanation">
+        <div class="math-block">
+            <code>Image → 3D NumPy Array (Height × Width × RGB)</code>
+        </div>
+        <p>
+            The engine calculates luminosity using:<br>
+            <code class="formula">L = 0.299R + 0.587G + 0.114B</code>
+        </p>
+        <p>
+            Pixels within the threshold mask are isolated and sorted using 
+            deterministic algorithms (argsort), then placed back into the 
+            original array—creating the signature "melting" effect.
+        </p>
+    </div>
+</section>
+
+{% if popular_recipes %}
+<section class="section">
+    <h2 class="section-title">Popular Recipes</h2>
+    <div class="recipes-grid">
+        {% for recipe in popular_recipes %}
+        <div class="recipe-card">
+            <h3>{{ recipe.name }}</h3>
+            <div class="recipe-params">
+                <span>{{ recipe.get_sort_direction_display }}</span>
+                <span>{{ recipe.get_sort_by_display }}</span>
+                <span>{{ recipe.threshold_low|floatformat:2 }} — {{ recipe.threshold_high|floatformat:2 }}</span>
+            </div>
+            <p class="recipe-uses">Used {{ recipe.times_used }} times</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="section-action">
+        <a href="{% url 'recipes' %}" class="btn-outline">View All Recipes</a>
+    </div>
+</section>
+{% endif %}
+
+{% if recent_art %}
+<section class="section section-dark">
+    <h2 class="section-title">Recent Works</h2>
+    <div class="gallery-grid">
+        {% for art in recent_art %}
+        <div class="gallery-item">
+            {% if art.processed_image %}
+            <img src="{{ art.processed_image.url }}" alt="{{ art.title }}">
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="section-action">
+        <a href="{% url 'public_gallery' %}" class="btn-outline">View Gallery</a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

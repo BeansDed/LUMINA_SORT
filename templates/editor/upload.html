@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Upload — LUMINA_SORT{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>Upload Image</h1>
+        <p class="page-subtitle">Select a photograph to transform</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="upload-form">
+        {% csrf_token %}
+        
+        <div class="upload-zone" id="upload-zone">
+            <div class="upload-icon">+</div>
+            <p>Drag & drop an image here<br>or click to browse</p>
+            <input type="file" name="image" id="image-input" accept="image/*" required>
+        </div>
+        
+        <div class="preview-container" id="preview-container" style="display: none;">
+            <img id="image-preview" src="" alt="Preview">
+        </div>
+        
+        <div class="form-group">
+            <label for="id_title">Title (optional)</label>
+            <input type="text" name="title" id="id_title" placeholder="Untitled">
+        </div>
+        
+        <button type="submit" class="btn-solid btn-full">Continue to Processing</button>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    const uploadZone = document.getElementById('upload-zone');
+    const imageInput = document.getElementById('image-input');
+    const previewContainer = document.getElementById('preview-container');
+    const imagePreview = document.getElementById('image-preview');
+    
+    uploadZone.addEventListener('click', () => imageInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            imageInput.files = e.dataTransfer.files;
+            showPreview(e.dataTransfer.files[0]);
+        }
+    });
+    
+    imageInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            showPreview(e.target.files[0]);
+        }
+    });
+    
+    function showPreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            previewContainer.style.display = 'block';
+            uploadZone.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Result — LUMINA_SORT{% endblock %}
+
+{% block content %}
+<div class="page-container wide">
+    <div class="page-header">
+        <h1>{{ art_piece.title }}</h1>
+        <p class="page-subtitle">Processing complete</p>
+    </div>
+    
+    <div class="result-layout">
+        <div class="comparison-panel">
+            <div class="comparison-item">
+                <h3>Original</h3>
+                <div class="image-frame">
+                    <img src="{{ art_piece.original_image.url }}" alt="Original">
+                </div>
+            </div>
+            <div class="comparison-item">
+                <h3>Processed</h3>
+                <div class="image-frame">
+                    {% if art_piece.processed_image %}
+                    <img src="{{ art_piece.processed_image.url }}" alt="Processed">
+                    {% else %}
+                    <p class="no-image">No processed image</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions-panel">
+            <h3>Export for Socials</h3>
+            <div class="export-buttons">
+                <a href="{% url 'export' art_piece.id 'story' %}" class="btn-outline">
+                    Instagram Story (9:16)
+                </a>
+                <a href="{% url 'export' art_piece.id 'post' %}" class="btn-outline">
+                    Instagram Post (4:5)
+                </a>
+            </div>
+            
+            <h3>Save Settings</h3>
+            <a href="{% url 'save_recipe' art_piece.id %}" class="btn-outline btn-full">
+                Save as Recipe
+            </a>
+            
+            <h3>Actions</h3>
+            <div class="action-buttons">
+                <a href="{% url 'process' art_piece.id %}" class="btn-outline">
+                    Re-process
+                </a>
+                <a href="{% url 'upload' %}" class="btn-solid">
+                    New Image
+                </a>
+            </div>
+            
+            {% if art_piece.recipe_used %}
+            <div class="recipe-info">
+                <h4>Recipe Used</h4>
+                <p>{{ art_piece.recipe_used.name }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

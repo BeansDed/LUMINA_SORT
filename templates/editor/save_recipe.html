@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Save Recipe — LUMINA_SORT{% endblock %}
+
+{% block content %}
+<div class="page-container narrow">
+    <div class="page-header">
+        <h1>Save as Recipe</h1>
+        <p class="page-subtitle">Save the settings from "{{ art_piece.title }}"</p>
+    </div>
+    
+    <form method="post" class="recipe-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_name">Recipe Name</label>
+            <input type="text" name="name" id="id_name" 
+                   placeholder="e.g., Cyberpunk Melt" required
+                   value="{{ form.name.value|default:'' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="id_description">Description</label>
+            <textarea name="description" id="id_description" rows="3"
+                      placeholder="Describe the visual effect...">{{ form.description.value|default:'' }}</textarea>
+        </div>
+        
+        <div class="current-params">
+            <h3>Current Parameters</h3>
+            <div class="params-display">
+                <span>Threshold: {{ form.threshold_low.value|floatformat:2 }} — {{ form.threshold_high.value|floatformat:2 }}</span>
+                <span>Direction: {{ form.sort_direction.value }}</span>
+                <span>Sort By: {{ form.sort_by.value }}</span>
+            </div>
+        </div>
+        
+        <!-- Hidden fields with current values -->
+        <input type="hidden" name="threshold_low" value="{{ form.threshold_low.value }}">
+        <input type="hidden" name="threshold_high" value="{{ form.threshold_high.value }}">
+        <input type="hidden" name="sort_direction" value="{{ form.sort_direction.value }}">
+        <input type="hidden" name="sort_by" value="{{ form.sort_by.value }}">
+        <input type="hidden" name="reverse_sort" value="{{ form.reverse_sort.value }}">
+        
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" name="is_public" checked>
+                <span>Make Public</span>
+            </label>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'result' art_piece.id %}" class="btn-outline">Cancel</a>
+            <button type="submit" class="btn-solid">Save Recipe</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
