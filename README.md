@@ -2,187 +2,125 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![Django](https://img.shields.io/badge/Django-5.0+-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
-**LUMINA_SORT** is a Django-based image manipulation engine that transforms standard photography into high-fashion, glitch-aesthetic digital art.
+**LUMINA_SORT** is a Django-based image manipulation engine that transforms photography into glitch-style digital art using deterministic pixel sorting instead of generative AI.
 
-Unlike modern AI filters that "guess" pixels, LUMINA_SORT uses **deterministic sorting algorithms** to physically rearrange the pixel data of an image based on luminosity, hue, and saturation values. It is designed for creative developers and digital artists who want precise control over the chaos.
-
----
-
-## 📸 Features
-
-- **Algorithmic Sorting**: Implements custom sorting logic to "melt" pixels in vertical or horizontal intervals
-- **Threshold Masking**: Users can define specific "mask" ranges (e.g., "only sort the highlights" or "only sort the shadows")
-- **Recipe Database**: A SQLite/PostgreSQL backend that stores parameter combinations, allowing users to save and reuse their favorite "glitch settings"
-- **Social Optimization**: Auto-resizing for Instagram Story (9:16) and Portrait Post (4:5) formats
-- **User Gallery**: Personal galleries with public/private visibility controls
+The engine rearranges pixel data using luminosity, hue, saturation, and RGB-based sort keys so the same inputs and parameters produce repeatable results.
 
 ---
 
-## 🛠 Tech Stack
+## Features
+
+- **Algorithmic pixel sorting** — horizontal or vertical interval sorting
+- **Threshold masking** — target shadows, midtones, highlights, or custom ranges
+- **Multiple sort criteria** — luminosity, hue, saturation, and RGB channels
+- **Recipe system** — save and reuse processing configurations
+- **User gallery** — store original and processed images
+- **Export presets** — portrait and story-friendly output sizes
+- **No generative AI** — effects come from deterministic image-processing logic
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| **Framework** | Django 5.0 (Python) |
-| **Processing** | NumPy & Pillow (PIL) — No AI/Neural Networks |
-| **Database** | SQLite (Dev) / PostgreSQL (Prod) |
-| **Frontend** | HTML5 / CSS3 — Minimal black/white aesthetic |
+|---|---|
+| Framework | Django 5 / Python |
+| Processing | NumPy + Pillow |
+| Database | SQLite for development, PostgreSQL-ready for production |
+| Frontend | HTML5 + CSS3 |
 
 ---
 
-## 🧮 How It Works (The Math)
+## How It Works
 
-The core engine treats an image as a **3-Dimensional NumPy array** `(Height, Width, RGB Channels)`.
+The core engine treats an image as a three-dimensional NumPy array:
 
+```python
+image_array.shape  # (height, width, rgb_channels)
 ```
-Image → np.array(image) → shape: (H, W, 3)
+
+A simplified processing pipeline is:
+
+1. Calculate a luminosity or color-based value for each pixel.
+2. Build a threshold mask.
+3. Find contiguous intervals that match the mask.
+4. Sort pixels inside each interval.
+5. Reconstruct the image with the sorted slices.
+
+Example luminosity calculation:
+
+```text
+L = 0.299R + 0.587G + 0.114B
 ```
 
-### The Algorithm:
+Example threshold mask:
 
-1. **Calculate Luminosity Mask**
-   ```
-   L = 0.299R + 0.587G + 0.114B
-   ```
+```python
+mask = (luminosity >= threshold_low) & (luminosity <= threshold_high)
+```
 
-2. **Create Threshold Mask**
-   ```python
-   mask = (luminosity >= threshold_low) & (luminosity <= threshold_high)
-   ```
+Example deterministic sort:
 
-3. **Find Contiguous Intervals**
-   - Scan each row (horizontal) or column (vertical)
-   - Identify sequences of pixels that fall within the mask
-
-4. **Sort Intervals**
-   ```python
-   indices = np.argsort(sort_keys)  # Deterministic sorting
-   sorted_pixels = pixels[indices]
-   ```
-
-5. **Reconstruct Image**
-   - Place sorted slices back into the original array
-   - This creates the signature "melting" or "streaking" effect
-
-### Sorting Criteria:
-- **Luminosity** (brightness)
-- **Hue** (color wheel position)
-- **Saturation** (color intensity)
-- **Individual RGB channels**
+```python
+indices = np.argsort(sort_keys)
+sorted_pixels = pixels[indices]
+```
 
 ---
 
-## 🚀 Setup
+## Run Locally
 
-### Prerequisites
+### Requirements
+
 - Python 3.10+
 - pip
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/lumina_sort.git
-cd lumina_sort
+git clone https://github.com/BeansDed/LUMINA_SORT.git
+cd LUMINA_SORT
 
-# Create virtual environment (recommended)
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-# Install dependencies
+Activate the environment:
+
+```bash
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+```
+
+Install dependencies and start Django:
+
+```bash
 pip install -r requirements.txt
-
-# Run migrations
 python manage.py migrate
-
-# Create superuser (optional, for admin access)
-python manage.py createsuperuser
-
-# Start development server
 python manage.py runserver
 ```
 
-Visit `http://127.0.0.1:8000` in your browser.
+Open `http://127.0.0.1:8000` in your browser.
 
 ---
 
-## 📁 Project Structure
+## Usage
 
-```
-lumina_sort/
-├── lumina_sort/          # Django project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── editor/               # Main application
-│   ├── models.py         # AestheticRecipe, ArtPiece
-│   ├── views.py          # Upload, Process, Gallery views
-│   ├── pixel_sorter.py   # Core sorting engine
-│   ├── forms.py
-│   └── urls.py
-├── templates/            # HTML templates
-│   ├── base.html
-│   └── editor/
-├── static/
-│   └── css/
-│       └── style.css     # Minimal B&W aesthetic
-├── media/                # User uploads (gitignored)
-│   ├── originals/
-│   ├── processed/
-│   └── exports/
-├── manage.py
-├── requirements.txt
-└── README.md
-```
+1. Sign in or create an account.
+2. Upload an image.
+3. Pick a saved recipe or configure custom thresholds and sorting options.
+4. Process the image.
+5. Save or export the result.
+6. Reuse successful settings as recipes.
 
 ---
 
-## 📊 Database Schema
+## Production Configuration
 
-### AestheticRecipe
-Stores reusable sorting configurations.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | CharField | Recipe name (e.g., "Cyberpunk Melt") |
-| `threshold_low` | FloatField | Lower brightness bound (0-1) |
-| `threshold_high` | FloatField | Upper brightness bound (0-1) |
-| `sort_direction` | CharField | 'H' (Horizontal) or 'V' (Vertical) |
-| `sort_by` | CharField | L/H/S/R/G/B |
-| `times_used` | IntegerField | Usage counter |
-| `is_public` | BooleanField | Visibility flag |
-
-### ArtPiece
-Stores user uploads and processed results.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `user` | ForeignKey | Owner reference |
-| `original_image` | ImageField | Source photograph |
-| `processed_image` | ImageField | Sorted result |
-| `export_story` | ImageField | 9:16 export |
-| `export_post` | ImageField | 4:5 export |
-| `recipe_used` | ForeignKey | Applied recipe (nullable) |
-
----
-
-## 🎨 Usage
-
-1. **Sign Up / Login** to create an account
-2. **Upload** any photograph
-3. **Configure** sorting parameters:
-   - Choose a pre-made recipe, OR
-   - Set custom thresholds, direction, and sort criteria
-4. **Process** the image
-5. **Export** for Instagram Story or Post
-6. **Save** your settings as a new recipe for reuse
-
----
-
-## 🔧 Configuration
-
-### Environment Variables (Production)
+Typical environment variables:
 
 ```bash
 SECRET_KEY=your-production-secret-key
@@ -191,42 +129,10 @@ ALLOWED_HOSTS=yourdomain.com
 DATABASE_URL=postgres://user:pass@host:5432/dbname
 ```
 
-### PostgreSQL (Production)
-
-Update `settings.py`:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'lumina_sort',
-        'USER': 'your_user',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+Keep real secrets out of version control and configure them through your deployment environment.
 
 ---
 
-## 📜 License
+## Core Idea
 
-MIT License — See [LICENSE](LICENSE) for details.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## ✨ Credits
-
-Built with pure algorithmic mathematics. No AI. No neural networks. Just deterministic pixel manipulation.
-
-**LUMINA_SORT** — *Where mathematics meets fashion.*
+LUMINA_SORT explores how traditional algorithms can produce visually complex results without relying on a neural network. The project combines image processing, deterministic sorting, web application development, and reusable creative workflows.
